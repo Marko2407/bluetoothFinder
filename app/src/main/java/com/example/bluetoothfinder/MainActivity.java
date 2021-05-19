@@ -49,12 +49,16 @@ public class MainActivity extends AppCompatActivity {
                String address = device.getAddress();
                String rssi = Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE));
                Log.i("Device Found", "Name: "+ name+ "Address: " + address + "RSSI: " +  rssi);
-
+               String deviceString = "";
                if (name==null  || name.equals("")){
-                   bluetoothDevice.add(address + " - RSSI " + rssi + "dBm" );
+                 deviceString =address + " - RSSI " + rssi + "dBm" ;
 
                }else {
-                   bluetoothDevice.add(name + " -RSSI " + rssi + "dBm" );
+                   deviceString = name + " -RSSI " + rssi + "dBm" ;
+               }
+
+               if (!bluetoothDevice.contains(deviceString)){
+                   bluetoothDevice.add(deviceString);
                }
                arrayAdapter.notifyDataSetChanged();
             }
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         textView.setText("Searching...");
         button.setEnabled(false);
+        bluetoothDevice.clear();
         bluetoothAdapter.startDiscovery();
 
     }
