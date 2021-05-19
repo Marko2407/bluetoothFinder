@@ -1,9 +1,5 @@
 package com.example.bluetoothfinder;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -20,7 +16,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     ListView listView;
     ArrayList<String> bluetoothDevice = new ArrayList<>();
+    ArrayList<String> addresses = new ArrayList<>();
     ArrayAdapter arrayAdapter;
 
     BluetoothAdapter bluetoothAdapter;
@@ -39,37 +39,38 @@ public class MainActivity extends AppCompatActivity {
             String action = intent.getAction();
             Log.i("Action", action);
 
-            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 textView.setText("Done...");
                 button.setEnabled(true);
 
-            } else if (BluetoothDevice.ACTION_FOUND.equals(action)){
+            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-               String name = device.getName();
-               String address = device.getAddress();
-               String rssi = Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE));
-               Log.i("Device Found", "Name: "+ name+ "Address: " + address + "RSSI: " +  rssi);
-               String deviceString = "";
-               if (name==null  || name.equals("")){
-                 deviceString =address + " - RSSI " + rssi + "dBm" ;
+                String name = device.getName();
+                String address = device.getAddress();
+                String rssi = Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
+                Log.i("Device Found", "Name: " + name + "Address: " + address + "RSSI: " + rssi);
 
-               }else {
-                   deviceString = name + " -RSSI " + rssi + "dBm" ;
-               }
-
-               if (!bluetoothDevice.contains(deviceString)){
-                   bluetoothDevice.add(deviceString);
-               }
-               arrayAdapter.notifyDataSetChanged();
+                if (!addresses.contains(address)) {
+                    addresses.add(address);
+                    String deviceString = "";
+                    if (name == null || name.equals("")) {
+                        deviceString = address + " - RSSI " + rssi + "dBm";
+                    } else {
+                        deviceString = name + " -RSSI " + rssi + "dBm";
+                    }
+                    bluetoothDevice.add(deviceString);
+                    arrayAdapter.notifyDataSetChanged();
+                }
             }
         }
     };
 
-    public void find(View view){
+    public void find(View view) {
 
         textView.setText("Searching...");
         button.setEnabled(false);
         bluetoothDevice.clear();
+        addresses.clear();
         bluetoothAdapter.startDiscovery();
 
     }
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION},0);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
 
         textView = findViewById(R.id.statusTextView);
@@ -97,11 +98,10 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver( receiver, intentFilter);
-
-
-
+        registerReceiver(receiver, intentFilter);
 
 
     }
 }
+
+
