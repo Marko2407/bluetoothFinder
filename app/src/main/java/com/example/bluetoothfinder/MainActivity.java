@@ -15,15 +15,21 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     Button button;
     ListView listView;
+    ArrayList<String> bluetoothDevice = new ArrayList<>();
+    ArrayAdapter arrayAdapter;
 
     BluetoothAdapter bluetoothAdapter;
 
@@ -37,6 +43,20 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText("Done...");
                 button.setEnabled(true);
 
+            } else if (BluetoothDevice.ACTION_FOUND.equals(action)){
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+               String name = device.getName();
+               String address = device.getAddress();
+               String rssi = Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE));
+               Log.i("Device Found", "Name: "+ name+ "Address: " + address + "RSSI: " +  rssi);
+
+               if (name==null  || name.equals("")){
+                   bluetoothDevice.add(address + " - RSSI " + rssi + "dBm" );
+
+               }else {
+                   bluetoothDevice.add(name + " -RSSI " + rssi + "dBm" );
+               }
+               arrayAdapter.notifyDataSetChanged();
             }
         }
     };
@@ -60,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.statusTextView);
         button = findViewById(R.id.searchButton);
         listView = findViewById(R.id.listView);
+
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bluetoothDevice);
+
+        listView.setAdapter(arrayAdapter);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
