@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     if (name == null || name.equals("")) {
                         deviceString = address + " - RSSI " + rssi + "dBm";
                     } else {
-                        deviceString = name + " -RSSI " + rssi + "dBm";
+                        deviceString = name + " - RSSI " + rssi + "dBm";
                     }
                     bluetoothDevice.add(deviceString);
                     arrayAdapter.notifyDataSetChanged();
